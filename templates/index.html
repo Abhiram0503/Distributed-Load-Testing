@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Metrics Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #metric-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        #metric-table th, #metric-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+
+        #metric-table th {
+            background-color: #f2f2f2;
+        }
+
+        #metric-list td {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Metrics Dashboard</h1>
+
+    <table id="metric-table">
+        <thead>
+            <tr>
+                <th>Mean</th>
+                <th>Max</th>
+                <th>Min</th>
+                <th>Median</th>
+            </tr>
+        </thead>
+        <tbody id="metric-list"></tbody>
+    </table>
+
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+        socket.on('new_message', function(msg) {
+            var metricList = document.getElementById('metric-list');
+            var data = JSON.parse(msg.message);
+
+            // Convert values to float
+            data = data.map(parseFloat);
+
+            // Create a new table row
+            var newRow = document.createElement('tr');
+
+            // Append cells with the data
+            for (var i = 0; i < data.length; i++) {
+                var cell = document.createElement('td');
+                cell.appendChild(document.createTextNode(data[i]));
+                newRow.appendChild(cell);
+            }
+
+            // Append the new row to the table
+            metricList.appendChild(newRow);
+        });
+    </script>
+</body>
+</html>
